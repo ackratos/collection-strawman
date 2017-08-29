@@ -6,7 +6,7 @@ import strawman.collection.immutable.NumericRange
 import scala.language.implicitConversions
 import strawman.collection.mutable.Builder
 
-import scala.{Any, Int, Integral, Nothing, Ordering, Some}
+import scala.{Any, Int, Integral, Nothing, Ordering, deprecated, `inline`, Some}
 import scala.Predef.implicitly
 import scala.annotation.unchecked.uncheckedVariance
 
@@ -32,6 +32,10 @@ trait Factory[-A, +C] extends Any {
   /** Get a Builder for the collection. For non-strict collection types this will use an intermediate buffer.
     * Building collections with `fromSpecific` is preferred because it can be lazy for lazy collections. */
   def newBuilder(): Builder[A, C]
+
+  @deprecated("Use newBuilder() instead of apply()", "2.13.0")
+  @`inline` def apply(from: Any): Builder[A, C] = newBuilder()
+  //@`inline` def apply(from: From): Builder[A, C] = newBuilder(from)
 }
 
 /** Base trait for companion objects of unconstrained collection types that may require

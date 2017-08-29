@@ -70,4 +70,7 @@ class ArrayOps[A](val xs: Array[A]) extends AnyVal
   @`inline` final def :+ [B >: A : ClassTag](x: B): Array[B] = append(x)
   def prepend[B >: A : ClassTag](x: B): Array[B] = fromTaggedIterable(View.Prepend(x, toIterable))
   @`inline` final def +: [B >: A : ClassTag](x: B): Array[B] = prepend(x)
+
+  def patch[B >: A : ClassTag](from: Int, other: Iterable[B], replaced: Int): Array[B] =
+    fromTaggedIterable(new View.Patched(toIterable, from, other, replaced))
 }

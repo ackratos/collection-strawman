@@ -9,7 +9,7 @@ package object collection extends LowPriority {
   // ------------------ Decorators to add collection ops to existing types -----------------------
 
   /** Decorator to add collection operations to strings. */
-  implicit def stringToStringOps(s: String): immutable.StringOps = new immutable.StringOps(s)
+  implicit def stringToStringOps(s: String): StringOps = new StringOps(s)
 
   /** Decorator to add collection operations to arrays. */
   implicit def arrayToArrayOps[A](as: Array[A]): ArrayOps[A] = new ArrayOps[A](as)
@@ -106,6 +106,6 @@ class LowPriority {
   /** Convert array to WrappedArray. Lower priority than ArrayOps */
   implicit def arrayToWrappedArray[T](xs: Array[T]): mutable.IndexedSeq[T] = mutable.WrappedArray.make[T](xs)
 
-  /** Convert string to iterable via view. Lower priority than StringOps */
-  implicit def stringToView(s: String): immutable.StringView = new immutable.StringView(s)
+  /** Convert String to Seq. Lower priority than StringOps */
+  implicit def stringToSeq(s: String): immutable.WrappedString = new immutable.WrappedString(s)
 }

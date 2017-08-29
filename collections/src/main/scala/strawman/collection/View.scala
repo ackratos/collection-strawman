@@ -1,8 +1,9 @@
 package strawman.collection
 
 import strawman.collection.mutable.{ArrayBuffer, Builder}
+import strawman.collection.immutable.ImmutableArray
 
-import scala.{Any, Boolean, Equals, IllegalArgumentException, Int, NoSuchElementException, Nothing, annotation, IndexOutOfBoundsException, throws}
+import scala.{Any, Boolean, Equals, IllegalArgumentException, Int, NoSuchElementException, Nothing, annotation, IndexOutOfBoundsException, throws, AnyRef}
 import scala.Predef.{<:<, intWrapper}
 
 /** Concrete collection type: View
@@ -209,11 +210,26 @@ object View extends IterableFactoryLike[View] {
   }
 
   /** A view that zips elements of the underlying collection with the elements
-   *  of another collection or iterator.
-   */
+    *  of another collection.
+    */
   case class Zip[A, B](underlying: Iterable[A], other: Iterable[B]) extends View[(A, B)] {
     def iterator() = underlying.iterator().zip(other)
     override def knownSize = underlying.knownSize min other.knownSize
+  }
+
+  /** A view that zips elements of the underlying collection with the elements
+    *  of another collection or iterator. If one of the two collections is shorter than the other,
+    *  placeholder elements are used to extend the shorter collection to the length of the longer.
+    */
+  case class ZipAll[A, B](underlying: Iterable[A], other: Iterable[B], thisElem: A, thatElem: B) extends View[(A, B)] {
+    def iterator() = underlying.iterator().zipAll(other, thisElem, thatElem)
+    override def knownSize = {
+      val s1 = underlying.knownSize
+      if(s1 == -1) -1 else {
+        val s2 = other.knownSize
+        if(s2 == -1) -1 else s1 max s2
+      }
+    }
   }
 
   /** A view that appends an element to its elements */
@@ -252,7 +268,7 @@ object View extends IterableFactoryLike[View] {
     override def knownSize: Int = underlying.knownSize
   }
 
-  case class Unzip[A, A1, A2](underlying: Iterable[A])(implicit asPair: A <:< (A1, A2)) {
+  case class Unzip[A, A1, A2](underlying: Iterable[A])(implicit asPair: A => (A1, A2)) {
     val first: View[A1] =
       new View[A1] {
         def iterator(): Iterator[A1] = underlying.iterator().map(_._1)
@@ -285,10 +301,34 @@ object View extends IterableFactoryLike[View] {
 }
 
 /** A trait representing indexable collections with finite length */
-trait ArrayLike[+A] extends Any {
+trait ArrayLike[+A] extends Any { self =>
   def length: Int
   @throws[IndexOutOfBoundsException]
   def apply(i: Int): A
+
+  //TODO used in scala.reflect; this looks like a very specific use case; is it worth keeping?
+  /** Creates a possibly nested `IndexedView` which consists of all the elements
+    *  of this array. If the elements are arrays themselves, the `deep` transformation
+    *  is applied recursively to them. The `className` of the `IndexedView` is
+    *  "Array", hence the `IndexedView` prints like an array with all its
+    *  elements shown, and the same recursively for any subarrays.
+    *
+    *  Example:
+    *  {{{
+    *  Array(Array(1, 2), Array(3, 4)).deep.toString
+    *  }}}
+    *  prints: `Array(Array(1, 2), Array(3, 4))`
+    *
+    *  @return    An possibly nested indexed view consisting of all the elements of the array.
+    */
+  def deep: strawman.collection.IndexedView[Any] = new strawman.collection.IndexedView[Any] {
+    def length = self.length
+    def apply(idx: Int): Any = self.apply(idx) match {
+      case x: AnyRef if x.getClass.isArray => ImmutableArray.unsafeWrapArray(x).view.deep
+      case x => x
+    }
+    override def className = "Array"
+  }
 }
 
 /** View defined in terms of indexing a range */
