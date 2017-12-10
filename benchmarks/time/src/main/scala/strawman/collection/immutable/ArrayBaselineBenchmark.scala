@@ -7,17 +7,19 @@ import org.openjdk.jmh.infra.Blackhole
 import strawman.collection.{ArrayView, View}
 import scala.{Any, AnyRef, Int, Long, Unit, Array}
 import scala.Predef.intWrapper
+import scala.Predef.genericArrayOps
 
 @BenchmarkMode(scala.Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Fork(15)
-@Warmup(iterations = 30)
+@Fork(2)
+@Warmup(iterations = 15)
 @Measurement(iterations = 15)
 @State(Scope.Benchmark)
 class ArrayBaselineBenchmark {
 
   @Param(scala.Array("39", "282", "73121", "7312102"))
   var size: Int = _
+  var halfSize: Int = _
 
   @Param(scala.Array("39"))
   var vLoSize: Int = _
@@ -40,6 +42,7 @@ class ArrayBaselineBenchmark {
       array
     }
 
+    halfSize = size / 2
     v = fillArray(size)
     vLo = fillArray(vLoSize)
   }
@@ -103,6 +106,12 @@ class ArrayBaselineBenchmark {
         ret += v(i)
       i += 1
     }
+    bh.consume(ret)
+  }
+
+  @Benchmark
+  def sliceLaterHalf(bh: Blackhole) = {
+    val ret = v.slice(halfSize, size)
     bh.consume(ret)
   }
 

@@ -1,7 +1,8 @@
 package strawman.collection.immutable
 
 import strawman.collection
-import strawman.collection.{SeqFactory, IterableFactory, IterableOnce, Iterator, StrictOptimizedIterableOps, arrayToArrayOps}
+import strawman.collection.{SeqFactory, IterableFactory, IterableOnce, Iterator, StrictOptimizedIterableOps}
+import strawman.collection.ArrayOpsDecorators._
 
 import scala.{Any, Boolean, ClassCastException, IllegalArgumentException, IndexOutOfBoundsException, Int, Integral, NoSuchElementException, Numeric, Ordering, Serializable, StringContext, Unit, `inline`, math, specialized, throws}
 import scala.Predef.ArrowAssoc
@@ -203,7 +204,7 @@ sealed class NumericRange[T](
       override def containsTyped(el: A) = underlyingRange exists (x => fm(x) == el)
 
       override def toString = {
-        def simpleOf(x: Any): String = collection.arrayToArrayOps(x.getClass.getName.split("\\.")).last
+        def simpleOf(x: Any): String = collection.ArrayOpsDecorators.refArrayOps(x.getClass.getName.split("\\.")).last
         val stepped = simpleOf(underlyingRange.step)
         s"${super.toString} (using $underlyingRange of $stepped)"
       }

@@ -1,6 +1,6 @@
 package strawman
 
-import scala.{Any, AnyVal, Array, Boolean, Char, IllegalArgumentException, IndexOutOfBoundsException, Int, NoSuchElementException, Unit, UnsupportedOperationException, PartialFunction, Option, None, Some}
+import scala.{Any, AnyVal, AnyRef, Array, Byte, Boolean, Short, Long, Float, Double, Char, IllegalArgumentException, IndexOutOfBoundsException, Int, NoSuchElementException, Unit, UnsupportedOperationException, PartialFunction, Option, None, Some}
 import scala.Predef.{String, ArrowAssoc}
 import scala.reflect.ClassTag
 
@@ -12,7 +12,20 @@ package object collection extends LowPriority {
   implicit def stringToStringOps(s: String): immutable.StringOps = new immutable.StringOps(s)
 
   /** Decorator to add collection operations to arrays. */
-  implicit def arrayToArrayOps[A](as: Array[A]): ArrayOps[A] = new ArrayOps[A](as)
+  object ArrayOpsDecorators {
+    //  implicit def arrayToArrayOps[A](as: Array[A]): ArrayOps[A] = new ArrayOps[A](as)
+    implicit def booleanArrayOps(xs: Array[Boolean]): ArrayOps.ofBoolean   = new ArrayOps.ofBoolean(xs)
+    implicit def byteArrayOps(xs: Array[Byte]): ArrayOps.ofByte            = new ArrayOps.ofByte(xs)
+    implicit def charArrayOps(xs: Array[Char]): ArrayOps.ofChar            = new ArrayOps.ofChar(xs)
+    implicit def doubleArrayOps(xs: Array[Double]): ArrayOps.ofDouble      = new ArrayOps.ofDouble(xs)
+    implicit def floatArrayOps(xs: Array[Float]): ArrayOps.ofFloat         = new ArrayOps.ofFloat(xs)
+    implicit def intArrayOps(xs: Array[Int]): ArrayOps.ofInt               = new ArrayOps.ofInt(xs)
+    implicit def longArrayOps(xs: Array[Long]): ArrayOps.ofLong            = new ArrayOps.ofLong(xs)
+    implicit def refArrayOps[T <: AnyRef](xs: Array[T]): ArrayOps.ofRef[T] = new ArrayOps.ofRef[T](xs)
+    implicit def shortArrayOps(xs: Array[Short]): ArrayOps.ofShort         = new ArrayOps.ofShort(xs)
+    implicit def unitArrayOps(xs: Array[Unit]): ArrayOps.ofUnit            = new ArrayOps.ofUnit(xs)
+  }
+
 
   implicit class toNewIterator[A](val it: scala.Iterator[A]) extends AnyVal {
     def toStrawman = new strawman.collection.Iterator[A] {

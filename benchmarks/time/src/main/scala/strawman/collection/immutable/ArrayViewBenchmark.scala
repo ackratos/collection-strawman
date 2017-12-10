@@ -10,14 +10,15 @@ import scala.Predef.intWrapper
 
 @BenchmarkMode(scala.Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Fork(15)
-@Warmup(iterations = 30)
+@Fork(2)
+@Warmup(iterations = 15)
 @Measurement(iterations = 15)
 @State(Scope.Benchmark)
 class ArrayViewBenchmark {
 
   @Param(scala.Array("39", "282", "73121", "7312102"))
   var size: Int = _
+  var halfSize: Int = _
 
   @Param(scala.Array("39"))
   var vLoSize: Int = _
@@ -39,7 +40,7 @@ class ArrayViewBenchmark {
 
   @Setup(Level.Trial)
   def initTrial(): Unit = {
-
+    halfSize = size / 2
     v = ArrayView(fillArray(size))
     vLo = ArrayView(fillArray(vLoSize))
   }
@@ -64,6 +65,12 @@ class ArrayViewBenchmark {
       .filter(x  => x % 2L == 0L)
       .map(x => x * x)
       .foldLeft(0L)(_+_)
+    bh.consume(ret)
+  }
+
+  @Benchmark
+  def sliceLaterHalf(bh: Blackhole) = {
+    val ret = v.slice(halfSize, size)
     bh.consume(ret)
   }
 
