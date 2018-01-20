@@ -10,7 +10,7 @@ import scala.Predef.{intWrapper, $conforms}
 
 @BenchmarkMode(scala.Array(Mode.AverageTime))
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
-@Fork(1)
+@Fork(2)
 @Warmup(iterations = 8)
 @Measurement(iterations = 8)
 @State(Scope.Benchmark)
@@ -207,7 +207,7 @@ class ImmutableArrayBenchmark {
   def access_tail(bh: Blackhole): Unit = bh.consume(xs.tail)
 
   @Benchmark
-  def access_init(bh: Blackhole): Unit = bh.consume(xs.init)
+  def access_init(bh: Blackhole): Unit = bh.consume(xs.init)*/
 
   @Benchmark
   @OperationsPerInvocation(100)
@@ -298,5 +298,5 @@ class ImmutableArrayBenchmark {
   def transform_groupBy(bh: Blackhole): Unit = {
     val result = xs.groupBy(_ % 5)
     bh.consume(result)
-  }
+  }*/
 }

@@ -11,6 +11,7 @@ import scala.reflect.ClassTag
 import scala.runtime.ScalaRunTime
 import scala.Predef.intWrapper
 import java.util.Arrays
+import java.lang.System
 
 /**
   * An immutable array.
@@ -103,7 +104,7 @@ sealed abstract class ImmutableArray[+A]
 
   override def dropRight(n: Int): ImmutableArray[A] = ImmutableArray.unsafeWrapArray(new ArrayOps(unsafeArray).dropRight(n))
 
-  override def slice(from: Int, until: Int): ImmutableArray[A] = ImmutableArray.unsafeWrapArray(new ArrayOps(unsafeArray).slice(from, until))
+  override def slice(from: Int, until: Int): ImmutableArray[A]
 
   override def tail: ImmutableArray[A] = ImmutableArray.unsafeWrapArray(new ArrayOps(unsafeArray).tail)
 
@@ -187,6 +188,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofRef[_] => Arrays.equals(unsafeArray.asInstanceOf[Array[AnyRef]], that.unsafeArray.asInstanceOf[Array[AnyRef]])
       case _ => super.equals(that)
     }
+    override def slice(from: Int, until: Int): ImmutableArray[T] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange[T](unsafeArray, lo, until))
+    }
   }
 
   @SerialVersionUID(3L)
@@ -199,6 +204,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     override def equals(that: Any) = that match {
       case that: ofByte => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
+    }
+    override def slice(from: Int, until: Int): ImmutableArray[Byte] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
     }
   }
 
@@ -213,6 +222,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofShort => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
+    override def slice(from: Int, until: Int): ImmutableArray[Short] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+    }
   }
 
   @SerialVersionUID(3L)
@@ -225,6 +238,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     override def equals(that: Any) = that match {
       case that: ofChar => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
+    }
+    override def slice(from: Int, until: Int): ImmutableArray[Char] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
     }
   }
 
@@ -239,6 +256,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofInt => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
+    override def slice(from: Int, until: Int): ImmutableArray[Int] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+    }
   }
 
   @SerialVersionUID(3L)
@@ -251,6 +272,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     override def equals(that: Any) = that match {
       case that: ofLong => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
+    }
+    override def slice(from: Int, until: Int): ImmutableArray[Long] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
     }
   }
 
@@ -265,6 +290,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofFloat => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
+    override def slice(from: Int, until: Int): ImmutableArray[Float] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+    }
   }
 
   @SerialVersionUID(3L)
@@ -277,6 +306,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     override def equals(that: Any) = that match {
       case that: ofDouble => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
+    }
+    override def slice(from: Int, until: Int): ImmutableArray[Double] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
     }
   }
 
@@ -291,6 +324,10 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofBoolean => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
+    override def slice(from: Int, until: Int): ImmutableArray[Boolean] = {
+      val lo = scala.math.max(from, 0)
+      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+    }
   }
 
   @SerialVersionUID(3L)
@@ -303,6 +340,15 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     override def equals(that: Any) = that match {
       case that: ofUnit => unsafeArray.length == that.unsafeArray.length
       case _ => super.equals(that)
+    }
+    override def slice(from: Int, until: Int): ImmutableArray[Unit] = {
+      // cant use
+      // new ofUnit(util.Arrays.copyOfRange[Unit](array, from, until)) - Unit is special and doesnt compile
+      // cant use util.Arrays.copyOfRange[Unit](repr, from, until) - Unit is special and doesnt compile
+      val lo = scala.math.max(from, 0)
+      val res = new Array[Unit](until-lo)
+      System.arraycopy(unsafeArray, lo, res, 0, until-lo)
+      new ofUnit(res)
     }
   }
 }
