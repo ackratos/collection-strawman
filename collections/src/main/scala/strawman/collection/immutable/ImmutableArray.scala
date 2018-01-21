@@ -190,7 +190,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[T] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange[T](unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofRef(Arrays.copyOfRange[T](unsafeArray, lo, hi))
     }
   }
 
@@ -207,7 +208,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Byte] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofByte(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -224,7 +226,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Short] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofShort(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -241,7 +244,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Char] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofChar(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -258,7 +262,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Int] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofInt(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -275,7 +280,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Long] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofLong(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -292,7 +298,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Float] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofFloat(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -309,7 +316,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Double] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofDouble(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -326,7 +334,8 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
     }
     override def slice(from: Int, until: Int): ImmutableArray[Boolean] = {
       val lo = scala.math.max(from, 0)
-      ImmutableArray.unsafeWrapArray(Arrays.copyOfRange(unsafeArray, lo, until))
+      val hi = scala.math.min(until, length)
+      new ofBoolean(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
   }
 
@@ -346,8 +355,9 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       // new ofUnit(util.Arrays.copyOfRange[Unit](array, from, until)) - Unit is special and doesnt compile
       // cant use util.Arrays.copyOfRange[Unit](repr, from, until) - Unit is special and doesnt compile
       val lo = scala.math.max(from, 0)
-      val res = new Array[Unit](until-lo)
-      System.arraycopy(unsafeArray, lo, res, 0, until-lo)
+      val hi = scala.math.min(until, length)
+      val slicedLenght = hi - lo
+      val res = new Array[Unit](slicedLenght)
       new ofUnit(res)
     }
   }
