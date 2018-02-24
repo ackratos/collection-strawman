@@ -13,7 +13,7 @@ val collectionsScalaVersionSettings = Seq(
 val commonSettings = Seq(
   organization := "ch.epfl.scala",
   version := "0.10.0-SNAPSHOT",
-  scalaVersion := "2.12.4",
+  scalaVersion := "2.13.0-M2",
   scalacOptions ++= Seq("-deprecation", "-feature", "-unchecked", "-language:higherKinds"/*, "-opt:l:classpath"*/),
   scalacOptions ++= {
     if (!isDotty.value)
