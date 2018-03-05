@@ -220,6 +220,16 @@ class ImmutableArrayBenchmark {
   }
 
   @Benchmark
+  @OperationsPerInvocation(100)
+  def access_slice_empty(bh: Blackhole): Unit = {
+    var i = 0
+    while (i < 100) {
+      bh.consume(xs.slice(size, size  - size / (i + 1)))
+      i += 1
+    }
+  }
+
+  @Benchmark
   @OperationsPerInvocation(1000)
   def transform_updateLast(bh: Blackhole): Unit = {
     var i = 0

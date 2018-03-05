@@ -188,11 +188,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofRef[_] => Arrays.equals(unsafeArray.asInstanceOf[Array[AnyRef]], that.unsafeArray.asInstanceOf[Array[AnyRef]])
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[T] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofRef[T] = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        emptyImpl.asInstanceOf[ofRef[T]]
       else
         new ofRef(Arrays.copyOfRange[T](unsafeArray, lo, hi))
     }
@@ -213,7 +213,7 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofByte(Array.emptyByteArray)
       else
         new ofByte(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -230,11 +230,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofShort => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Short] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofShort = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofShort(Array.emptyShortArray)
       else
         new ofShort(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -251,11 +251,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofChar => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Char] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofChar = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofChar(Array.emptyCharArray)
       else
         new ofChar(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -272,11 +272,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofInt => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Int] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofInt = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofInt(Array.emptyIntArray)
       else
         new ofInt(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -293,11 +293,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofLong => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Long] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofLong = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofLong(Array.emptyLongArray)
       else
         new ofLong(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -314,11 +314,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofFloat => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Float] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofFloat = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofFloat(Array.emptyFloatArray)
       else
         new ofFloat(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -335,11 +335,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofDouble => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Double] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofDouble = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofDouble(new Array[Double](0))
       else
         new ofDouble(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -356,11 +356,11 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofBoolean => Arrays.equals(unsafeArray, that.unsafeArray)
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Boolean] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofBoolean = {
       val lo = scala.math.max(from, 0)
       val hi = scala.math.min(until, length)
       if (lo >= hi)
-        emptyImpl
+        new ofBoolean(Array.emptyBooleanArray)
       else
         new ofBoolean(Arrays.copyOfRange(unsafeArray, lo, hi))
     }
@@ -377,7 +377,7 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       case that: ofUnit => unsafeArray.length == that.unsafeArray.length
       case _ => super.equals(that)
     }
-    override def slice(from: Int, until: Int): ImmutableArray[Unit] = {
+    override def slice(from: Int, until: Int): ImmutableArray.ofUnit = {
       // cant use
       // new ofUnit(util.Arrays.copyOfRange[Unit](array, from, until)) - Unit is special and doesnt compile
       // cant use util.Arrays.copyOfRange[Unit](repr, from, until) - Unit is special and doesnt compile
@@ -385,10 +385,9 @@ object ImmutableArray extends StrictOptimizedClassTagSeqFactory[ImmutableArray] 
       val hi = scala.math.min(until, length)
       val slicedLength = hi - lo
       if (slicedLength <= 0)
-        emptyImpl
+        new ofUnit(new Array[Unit](0))
       else {
-        val res = new Array[Unit](slicedLength)
-        new ofUnit(res)
+        new ofUnit(new Array[Unit](slicedLength))
       }
     }
   }
